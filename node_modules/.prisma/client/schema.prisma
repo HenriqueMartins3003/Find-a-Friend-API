@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Porte {
+  Pequeno
+  Medio
+  Grande
+}
+
+model Pet {
+  id         String  @unique @default(uuid())
+  nome       String
+  raca       String  @default("SRD")
+  cor        String
+  porte      Porte   @default(Medio)
+  idade      Int
+  disponivel Boolean
+
+  org    Org    @relation(fields: [org_id], references: [id])
+  org_id String
+
+  @@map("pets")
+}
+
+model Org {
+  id            String   @unique @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  tel           String
+  role          Role     @default(USER)
+  created_at    DateTime @default(now())
+  Pet           Pet[]
+
+  endereco    Endereco @relation(fields: [endereco_id], references: [id])
+  endereco_id String
+
+  @@map("org")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum EstadoBrasil {
+  AC // Acre
+  AL // Alagoas
+  AP // Amapá
+  AM // Amazonas
+  BA // Bahia
+  CE // Ceará
+  DF // Distrito Federal
+  ES // Espírito Santo
+  GO // Goiás
+  MA // Maranhão
+  MT // Mato Grosso
+  MS // Mato Grosso do Sul
+  MG // Minas Gerais
+  PA // Pará
+  PB // Paraíba
+  PR // Paraná
+  PE // Pernambuco
+  PI // Piauí
+  RJ // Rio de Janeiro
+  RN // Rio Grande do Norte
+  RS // Rio Grande do Sul
+  RO // Rondônia
+  RR // Roraima
+  SC // Santa Catarina
+  SP // São Paulo
+  SE // Sergipe
+  TO // Tocantins
+}
+
+model Endereco {
+  id          String       @unique @default(uuid())
+  rua         String
+  numero      Int
+  complemento String
+  cep         Int
+  bairro      String
+  cidade      String
+  estado      EstadoBrasil
+  Org         Org[]
+
+  @@map("endereco")
+}

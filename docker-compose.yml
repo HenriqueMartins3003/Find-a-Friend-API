@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  api_find_a_friend:
+    image: bitnami/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRESQL_DATABASE: findafriend
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_ROOT_PASSWORD: postgres
+
+  redis: 
+    image: bitnami/redis
+    ports: 
+      - "6379:6379"
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      
+    volumes:
+      - C:\docker-volumes\redis:/data
+
+
+    
