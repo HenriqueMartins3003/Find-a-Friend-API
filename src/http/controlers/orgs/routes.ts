@@ -1,9 +1,10 @@
-import type { FastifyInstance } from "fastify";
 import { createOrg } from "./create";
+// biome-ignore lint/style/useImportType: <explanation>
+import { FastifyInstance } from "fastify";
 
-export const orgRoutes = (app: FastifyInstance) => {
+export async function orgRoutes (app: FastifyInstance) {
 
-  app.post('orgs', createOrg)
+  app.post('/orgs', createOrg)
 }
 
 
