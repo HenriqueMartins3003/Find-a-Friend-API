@@ -22,15 +22,15 @@ model Pet {
   idade      Int
   disponivel Boolean
 
-  org    Org    @relation(fields: [org_id], references: [id])
-  org_id String
+  org      Org    @relation(fields: [org_name], references: [name])
+  org_name String
 
   @@map("pets")
 }
 
 model Org {
   id            String   @unique @default(uuid())
-  name          String
+  name          String   @unique
   email         String   @unique
   password_hash String
   tel           String

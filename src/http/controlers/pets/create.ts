@@ -10,23 +10,27 @@ export const createPet = async (resquest: FastifyRequest, reply: FastifyReply ) 
         porte: z.enum(['Pequeno', 'Medio', 'Grande']),
         raca: z.string(),
         disponivel: z.boolean(),
-        org_id: z.string(),
+        org_name: z.string(),
     })
 
-    const { nome, idade, cor, porte, raca, disponivel, org_id } = createPetBody.parse(resquest.body)
+    const { nome, idade, cor, porte, raca, disponivel, org_name } = createPetBody.parse(resquest.body)
+    try {
+        await prisma.pet.create({
+            data: {
+                nome,
+                idade,
+                cor,
+                porte,
+                raca,
+                disponivel,
+                org_name
+            }
+        })    
+        return reply.status(201).send()
+    } catch (error) {
+        console.error(error)
+        return reply.status(500).send({message: `${error}`})
+    }
 
-    await prisma.pet.create({
-        data: {
-            nome,
-            idade,
-            cor,
-            porte,
-            raca,
-            disponivel,
-            org_id
-        }
-    })
-
-    return reply.status(201).send()
 }
 
