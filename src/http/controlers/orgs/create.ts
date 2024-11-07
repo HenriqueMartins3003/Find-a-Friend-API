@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import bcrypt from "bcrypt"
+import { makeRegisterOrg } from "@/use-cases/orgs/factory-orgs/make.registerOrg";
+import { EstadoBrasil, OrgRole } from "@/use-cases/orgs/create.use-case";
 
 
 
@@ -12,7 +12,7 @@ export const createOrg = async (resquest: FastifyRequest, reply: FastifyReply ) 
         email: z.string(),
         password: z.string(),
         tel: z.string(),
-        role: z.enum(['ADMIN', 'USER']),
+        role: z.nativeEnum(OrgRole),
         endereco: z.object({
           rua: z.string(),
           numero: z.coerce.number(),
@@ -20,35 +20,32 @@ export const createOrg = async (resquest: FastifyRequest, reply: FastifyReply ) 
           cep: z.coerce.number(),
           bairro: z.string(),
           cidade: z.string(),
-          estado: z.enum(['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']),
+          estado: z.nativeEnum(EstadoBrasil)
         }),
       })
 
       const { name, email, password, tel, role, endereco } = bodySchema.parse(resquest.body)
-      const hashedPassword = await bcrypt.hash(password, 6)
+            try {
+        const registerOrg = makeRegisterOrg()
 
-      await prisma.org.create({
-        data: {
-            name: name,
-            email: email,
-            password_hash: hashedPassword,
-            tel: tel,
-            role: role,
-            endereco: {
-              create: {
-                rua: endereco.rua,
-                numero: endereco.numero,
-                complemento: endereco.complemento,
-                cep: endereco.cep,
-                bairro: endereco.bairro,
-                cidade: endereco.cidade,
-                estado: endereco.estado,
-              },
-            }
-        }
-    })   
+        const org = await registerOrg.execute({
+          name,
+          email,
+          password,
+          tel,
+          role,
+          endereco
+        })  
 
-    return reply.status(201).send()
+        
+
+      } catch (error) {
+        
+      }
+
+
+    
+      return reply.status(201).send()
     
   } catch (error) {
     console.error(error)
