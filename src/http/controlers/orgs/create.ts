@@ -3,8 +3,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { makeRegisterOrg } from "@/use-cases/orgs/factory-orgs/make.registerOrg";
 import { EstadoBrasil, OrgRole } from "@/use-cases/orgs/create.use-case";
 
-
-
 export const createOrg = async (resquest: FastifyRequest, reply: FastifyReply ) => {
     try {
       const bodySchema = z.object({
@@ -25,7 +23,7 @@ export const createOrg = async (resquest: FastifyRequest, reply: FastifyReply ) 
       })
 
       const { name, email, password, tel, role, endereco } = bodySchema.parse(resquest.body)
-            try {
+      
         const registerOrg = makeRegisterOrg()
 
         const org = await registerOrg.execute({
@@ -37,16 +35,8 @@ export const createOrg = async (resquest: FastifyRequest, reply: FastifyReply ) 
           endereco
         })  
 
-        
+      return reply.status(201).send(org)        
 
-      } catch (error) {
-        
-      }
-
-
-    
-      return reply.status(201).send()
-    
   } catch (error) {
     console.error(error)
     return reply.status(500).send({message: `${error}`})    

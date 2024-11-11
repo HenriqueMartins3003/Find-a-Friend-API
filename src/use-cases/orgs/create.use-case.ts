@@ -1,4 +1,5 @@
 import {orgsRepository} from "@/repositories/org-repository";
+import { hash } from "bcrypt";
 
 export enum OrgRole {
     ADMIN = 'ADMIN',
@@ -22,6 +23,7 @@ export enum EstadoBrasil {
     PA = 'PA',
     PB = 'PB',
     PR = 'PR',
+    SP = 'SP',
     PE = 'PE',
     PI = 'PI',
     RJ = 'RJ',
@@ -59,25 +61,37 @@ export class CreateOrgUseCase {
         role,
         endereco,
     }: CreateOrgUseCaseRequest){
+      
+        const hashedPassword = await hash(password, 6)
+
+        const userAllreadyExists = await this.orgsRepository.findUnique(email)
+          
+    
+        if (userAllreadyExists) {
+         throw new Error("User allready exists")
+        }
         
-        
-           // this.orgsRepository.create({name,email,password,tel,role,endereco})
+    
+        const org =await this.orgsRepository.create({
+             name,
+             email,
+             password_hash: hashedPassword,
+             tel,
+             role,
+             endereco: {
+                create: {
+                    rua: endereco.rua,
+                    numero: endereco.numero,
+                    complemento: endereco.complemento,
+                    cep: endereco.cep,
+                    bairro: endereco.bairro,
+                    cidade: endereco.cidade,
+                    estado: endereco.estado
+                },
+            }
+        })
 
-           /*
-            const hashedPassword = await bcrypt.hash(password, 6)
-
-      const userAllreadyExists = await prisma.org.findUnique({
-        where: {
-          email: email,
-        },
-      })
-  
-      if (userAllreadyExists) {
-       throw new Error("User allready exists")
-      }
-
-*/ 
+        return { org} 
     }
     
-
 }
